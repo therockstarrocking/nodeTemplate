@@ -1,0 +1,5 @@
+{
+  "$class": "org.example.mynetwork.CQ",
+  "commodity": "resource:org.example.mynetwork.Commodity#cm1",
+  "quantity": 47
+}

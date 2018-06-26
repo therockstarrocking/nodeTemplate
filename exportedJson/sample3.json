@@ -1,0 +1,8 @@
+{
+  "$class": "org.example.mynetwork.Commodity",
+  "tradingSymbol": "cm10",
+  "description": "test commodity 3",
+  "mainExchange": "qwe",
+  "quantity": 400,
+  "owner": "resource:org.example.mynetwork.Trader#tr3"
+}
