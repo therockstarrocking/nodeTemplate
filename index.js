@@ -9,7 +9,8 @@ const replace = require('replace-in-file');
 const loading =  require('loading-cli');
 
 const load = loading('loading...')
-
+var scount = 0;
+var fcount = 0;
 //load.frame(["←", "↖", "↑", "↗", "→", "↘", "↓", "↙"]);
 //load.frame([".", "o", "O", "°", "O", "o", "."]);
 //load.frame(["⊶", "⊷"]);
@@ -24,13 +25,14 @@ load.color = 'blue';
 var watcher = chokidar.watch('./jsonFiles', {
   ignored: /[\/\\]\./, persistent: true
 });
-
+console.time("nstart");
 var log = console.log.bind(console);
 
 watcher
   .on('add', function(path) { 
-    load.start('File '+path+' has been added and Processing')
-    setTimeout(function(){
+    //load.start('File '+path+' has been added and Processing')
+   // setTimeout(function(){
+   
     fs.readFile(path, 'utf8', function (err, data) {
         if(err) {
             console.log("cannot read the file, something goes wrong with the file", err);
@@ -42,6 +44,7 @@ watcher
         if(index[3] == undefined || index[3] ==""){
             return;
         }
+        console.time("pstart");
         Request.post({
             "headers": { "content-type": "application/json" },
             "url": "http://localhost:3000/api/"+index[3]+"",
@@ -50,12 +53,18 @@ watcher
             if(error) {
                 return console.dir(error);
             }
-            console.log(" ");
+            //console.log(" ");
+            var respBody = JSON.parse(body);
+            if(respBody.error){
+                fcount++;
+            }else{
+                scount++;
+            }
             console.dir(JSON.parse(body));
-            load.stop();
+           // load.stop();
             if(body){
                 let newp = path.split('/');
-                var newPath = "exportedJson/"+newp[1];
+                let newPath = "exportedJson/"+newp[1];
                 fs.rename(path, newPath, function (err) {
                     if (err) {
                         if (err.code === 'EXDEV') {
@@ -66,12 +75,43 @@ watcher
                     }
                     
                 });
+                console.timeEnd("pstart");
             }
         });
+        
+        
         //console.log(file,obj);
     });
-},4000)
+
+//},4000)
 })
+setTimeout(function(){
+    stop();
+},6000)
+function stop(){
+    fs.readdir('./jsonFiles', function(err, files) {
+        //console.log("stop method called")
+        if (err) {   
+        } else {
+            if (!files.length) {
+                //watcher.close()
+                console.log("folder Empty")
+                console.timeEnd("nstart");
+                console.time("nstart");
+                console.log("success count:",scount);
+                console.log("failure count:",fcount);
+                setTimeout(function(){
+                    stop();
+                },1000)
+            }
+            else{
+                setTimeout(function(){
+                    stop();
+                },500)
+            }
+        }
+    });
+}
 
 function copy() {
     var readStream = fs.createReadStream(path);
@@ -120,7 +160,7 @@ function copy() {
         });
     });
 });*/
-var trnames = ["etr1","etr2"];
+/*var trnames = ["etr1","etr2"];
 Request.get("http://localhost:3001/api/org.examples.mynetwork.Trader", (error, response, body) => {
     if(error) {
         return console.dir(error);
@@ -153,10 +193,10 @@ Request.get("http://localhost:3001/api/org.examples.mynetwork.Trader", (error, r
                 };
                 var changes = replace.sync(options);
                 console.log('Modified files:', changes.join(', '));*/
-            });
-        }
-    }
+            //});
+        //}
+    //}
     //var filename = "tr3"
 
-})
+//})
 

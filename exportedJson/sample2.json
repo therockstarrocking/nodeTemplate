@@ -1,5 +1,0 @@
-{
-  "$class": "org.example.mynetwork.Trade",
-  "commodity": "resource:org.example.mynetwork.Commodity#cm3",
-  "newOwner": "resource:org.example.mynetwork.Trader#tr3"
-}
