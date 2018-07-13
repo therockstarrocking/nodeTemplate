@@ -8,6 +8,7 @@ var chokidar = require('chokidar');
 const replace = require('replace-in-file');
 const loading =  require('loading-cli');
 
+
 const load = loading('loading...')
 var scount = 0;
 var fcount = 0;
@@ -22,7 +23,7 @@ load.interval = 300;
 load.color = 'blue';
 
 
-var watcher = chokidar.watch('./jsonFiles', {
+var watcher = chokidar.watch('./transactions', {
   ignored: /[\/\\]\./, persistent: true
 });
 console.time("nstart");
@@ -57,14 +58,22 @@ watcher
             var respBody = JSON.parse(body);
             if(respBody.error){
                 fcount++;
+                let newp = path.split('/');
+                let newPath = "UnsuccTransactions/"+newp[1];
+                fs.rename(path, newPath, function (err) {
+                    if (err) {
+                        if (err.code === 'EXDEV') {
+                            copy();
+                        } else {
+                            console.log("error",err)
+                        }
+                    }
+                    console.timeEnd("pstart");
+                });
             }else{
                 scount++;
-            }
-            console.dir(JSON.parse(body));
-           // load.stop();
-            if(body){
                 let newp = path.split('/');
-                let newPath = "exportedJson/"+newp[1];
+                let newPath = "ProcessedTransactions/"+newp[1];
                 fs.rename(path, newPath, function (err) {
                     if (err) {
                         if (err.code === 'EXDEV') {
@@ -77,6 +86,11 @@ watcher
                 });
                 console.timeEnd("pstart");
             }
+            /*console.dir(JSON.parse(body));
+           // load.stop();
+            if(body){
+                
+            }*/
         });
         
         
@@ -87,22 +101,22 @@ watcher
 })
 setTimeout(function(){
     stop();
-},6000)
+},2000)
 function stop(){
-    fs.readdir('./jsonFiles', function(err, files) {
+    fs.readdir('./transactions', function(err, files) {
         //console.log("stop method called")
         if (err) {   
         } else {
             if (!files.length) {
                 //watcher.close()
-                console.log("folder Empty")
+                console.log("folder Empty");
                 console.timeEnd("nstart");
                 console.time("nstart");
                 console.log("success count:",scount);
                 console.log("failure count:",fcount);
                 setTimeout(function(){
                     stop();
-                },1000)
+                },2000)
             }
             else{
                 setTimeout(function(){
@@ -128,7 +142,7 @@ function copy() {
 }
 
 
-/*glob("jsonFiles/*.json", function(err, files) {
+/*glob("transactions/*.json", function(err, files) {
     if(err) {
         console.log("cannot read the folder, something goes wrong with glob", err);
     }
@@ -183,7 +197,7 @@ Request.get("http://localhost:3001/api/org.examples.mynetwork.Trader", (error, r
             data1 = data1.replace(/examples/g,'example')
             data1 = data1.replace(/[[]]/g,' ')
             //console.log(dt);
-            fs.writeFile('jsonFiles/'+filename+"", data1, (err) => {
+            fs.writeFile('transactions/'+filename+"", data1, (err) => {
                 if (err) throw err;
                 console.log("The ",filename," file was succesfully saved!");
                 /*const options = {

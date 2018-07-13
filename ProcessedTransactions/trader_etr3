@@ -1,6 +1,6 @@
 {
   "$class": "org.example.mynetwork.Trader",
-  "tradeId": "etr2",
-  "firstName": "zim",
+  "tradeId": "etr20",
+  "firstName": "sammy",
   "lastName": "joe"
 }
